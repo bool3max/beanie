@@ -13,6 +13,7 @@ incdir = include_directories('src/include/')
 lib_main = library(
     'beanie',
     'src/beanie.c',
+    depdendencies: dependency('bhashmap'),
     include_directories: incdir,
     install: true
 )
