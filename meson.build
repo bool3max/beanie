@@ -8,12 +8,17 @@ project(
     ]
 )
 
-incdir = include_directories('src/include/')
+cc = meson.get_compiler('c')
 
+incdir = include_directories('src/include/')
 lib_main = library(
     'beanie',
     'src/beanie.c',
-    depdendencies: dependency('bhashmap'),
+    dependencies: cc.find_library(
+        'bhashmap',
+        required: true,
+        has_headers: ['bhashmap.h']
+    ),
     include_directories: incdir,
     install: true
 )
