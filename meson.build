@@ -14,6 +14,7 @@ incdir = include_directories('src/include/')
 lib_main = library(
     'beanie',
     'src/beanie.c',
+    'src/utilities.c',
     dependencies: cc.find_library(
         'bhashmap',
         required: true,
