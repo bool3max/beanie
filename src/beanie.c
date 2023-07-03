@@ -11,6 +11,29 @@
 #define BEANIE_COMMENT_CHAR    ';'
 #define BEANIE_ASSIGNMENT_CHAR '='
 
+static void
+value_cleanup_iterator(const void *key, size_t keylen, void *value) {
+    free(value);
+}
+
+static void
+section_cleanup_iterator(const void *key, size_t keylen, void *value) {
+    BHashMap *child_section = value;
+    bhm_iterate(child_section, value_cleanup_iterator);
+    bhm_destroy(child_section);
+}
+
+/* Free all the resources occupied by the INI map data structure.
+These include the memory for all of the hashmaps (the root one as well as all of its
+children), as well as the memory for all of the keys and values.
+*/
+void
+beanie_cleanup(BeanieMap map_root) {
+    /* destroy all of the child maps */
+    bhm_iterate(map_root, section_cleanup_iterator);
+    bhm_destroy(map_root);
+}
+
 /*
 Parse the string buffer containing INI file data and return a structure
 that can then be queried for individual key-value pairs.
@@ -26,20 +49,20 @@ beanie_parse_buffer(const char *ini_data) {
     that stores INI key-value pairs not belonging to any section is indexed as "_" from the
     root map.
     */
-    BHashMap *map = bhm_create(0, NULL);
-    if (!map) {
+    BHashMap *map_root = bhm_create(0, NULL);
+    if (!map_root) {
         return NULL;
     }
 
     BHashMap *map_global = bhm_create(0, NULL);
 
     if (!map_global) {
-        bhm_destroy(map);
+        bhm_destroy(map_root);
         return NULL;
     }
 
-    if (!bhm_set(map, "_", sizeof("_"), map_global)) {
-        bhm_destroy(map);
+    if (!bhm_set(map_root, "_", sizeof("_"), map_global)) {
+        bhm_destroy(map_root);
         bhm_destroy(map_global);
         return NULL;
     }
@@ -99,7 +122,7 @@ beanie_parse_buffer(const char *ini_data) {
 
                     current_section = new_section;
 
-                    if (!bhm_set(map, section_name, strlen(section_name) + 1, current_section)) {
+                    if (!bhm_set(map_root, section_name, strlen(section_name) + 1, current_section)) {
                         /* TODO: CLEANUP MAPS */
                         free(section_name);
                         free(current_line);
@@ -156,7 +179,7 @@ beanie_parse_buffer(const char *ini_data) {
         free(current_line);
     }
 
-    return map;
+    return map_root;
 }
 
 /*

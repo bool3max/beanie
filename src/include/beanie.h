@@ -13,3 +13,6 @@ beanie_parse_file(const char *path);
 
 BeanieMap
 beanie_parse_stream(FILE *stream); 
+
+void
+beanie_cleanup(BeanieMap map);
