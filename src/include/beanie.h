@@ -5,6 +5,9 @@
 
 typedef BHashMap* BeanieMap;
 
+char *
+beanie_get(const BeanieMap map, const char *section, const char *key); 
+
 BeanieMap
 beanie_parse_buffer(const char *ini_data);
 

@@ -34,12 +34,37 @@ beanie_cleanup(BeanieMap map_root) {
     bhm_destroy(map_root);
 }
 
+/* Get a key-value pair from a certain section of a BeanieMap.
+To obtain a key-value pair from the global section, section can be either NULL
+or an underscore string ("_"). Returns a pointer to a null-terminated associated value
+of the key, or NULL if the key does not exist in the specified section.
+*/
+char *
+beanie_get(const BeanieMap map, const char *section, const char *key) {
+    BHashMap *s = bhm_get(
+        map,
+        section ? section : "_",
+        section ? strlen(section) + 1 : sizeof("_")
+    );
+
+    /* section does not exist */
+    if (!s) return NULL;
+
+    return bhm_get(
+        s,
+        key,
+        strlen(key) + 1
+    );
+}
+
 /*
 Parse the string buffer containing INI file data and return a structure
 that can then be queried for individual key-value pairs.
 
 ini_data should be a pointer to a null-terminated string containing the
 INI file data.
+
+In the case of an error or INI syntax error, NULL is returned.
 */
 BeanieMap
 beanie_parse_buffer(const char *ini_data) {
