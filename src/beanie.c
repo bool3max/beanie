@@ -67,6 +67,7 @@ beanie_parse_buffer(const char *ini_data) {
         return NULL;
     }
 
+    /* we store new key-value pairs here */
     BHashMap *current_section = map_global;
 
     const char *linectx = ini_data;
@@ -161,6 +162,9 @@ beanie_parse_buffer(const char *ini_data) {
                         free(current_line);
                         return NULL;
                     }
+
+                    free(key);
+
                     found_separator = true;
                     break;
                 }
@@ -220,12 +224,4 @@ beanie_parse_file(const char *path) {
     free(buffer);
 
     return parse_result;
-}
-
-/*
-A wrapper around beanie_parse_buffer that accepts a FILE* stream to read from and parse.
-*/
-BeanieMap
-beanie_parse_stream(FILE *stream) {
-
 }
