@@ -178,7 +178,7 @@ beanie_parse_buffer(const char *ini_data) {
             for (size_t i = 0; i < current_line_length; i++) {
                 if (current_line[i] == BEANIE_ASSIGNMENT_CHAR) {
                     char *key   = strip_whitespace(current_line, i),
-                         *value = strip_whitespace(current_line + i + 1, current_line_length - i + 1);
+                         *value = strip_whitespace(current_line + i + 1, current_line_length - i - 1);
 
                     if (!bhm_set(current_section, key, strlen(key) + 1, value)) {
                         /* TODO: CLEANUP MAPS */
@@ -188,6 +188,7 @@ beanie_parse_buffer(const char *ini_data) {
                         return NULL;
                     }
 
+                    /* bhashmap stores a copy of the key, we can free our buffer */
                     free(key);
 
                     found_separator = true;
