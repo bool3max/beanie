@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -14,12 +15,14 @@ this function.
 char *
 strip_whitespace(const char *str, const size_t len) {
     const char *start = str;
-    while (isspace(*start)) {
+    size_t l = len;
+    while (isspace(*start) && l) {
         start++;
+        l--;
     }
 
     /* either passed-in string was empty or composed of just whitespace - return an empty string */
-    if (*start == '\0') {
+    if (*start == '\0' || l == 0) {
         char *buf = malloc(1 * sizeof(char));
         if (!buf) return NULL;
         buf[0] = '\0';
